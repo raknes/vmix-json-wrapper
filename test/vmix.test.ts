@@ -15,6 +15,15 @@ describe('', () => {
     });
     const state = await vmix.getCurrentState();
     expect(state).not.toBeNull();
+
+    if (state == null) {
+      expect(false).toBeTruthy();
+      return;
+    }
+    expect(state.vmix.version).toBe('24.0.0.51');
+    expect(state.vmix.inputs.input[0].type).toBe('Blank');
+    expect(state.vmix.recording).toBe('False');
+    expect(state.vmix.active).toBe('1');
   });
 });
 

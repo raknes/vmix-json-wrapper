@@ -70,30 +70,14 @@ export interface VMixState {
         },
       ];
     };
-    preview: {
-      _: string;
-    };
-    active: {
-      _: string;
-    };
-    recording: {
-      _: boolean;
-    };
-    external: {
-      _: boolean;
-    };
-    streaming: {
-      _: boolean;
-    };
-    playlist: {
-      _: boolean;
-    };
-    multiCorder: {
-      _: boolean;
-    };
-    fullscreen: {
-      _: boolean;
-    };
+    preview: string;
+    active: string;
+    recording: string;
+    external: string;
+    streaming: string;
+    playlist: string;
+    multiCorder: string;
+    fullscreen: string;
     audio: {
       master: {
         volume: number;
