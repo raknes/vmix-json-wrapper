@@ -12,7 +12,6 @@
     "url": "git+https://github.com/raknes/vmix-json-wrapper.git"
   },
   "scripts": {
-    "install": "npm run build",
     "start": "env-cmd ts-node-dev src/index.ts",
     "build": "tsc",
     "lint": "eslint 'src/**/*.{js,ts}' --quiet --fix",
