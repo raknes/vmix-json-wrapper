@@ -1,6 +1,6 @@
 {
   "name": "vmix-json-wrapper",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple JSON wrapper for use with vMix HTTP API",
   "main": "dist/index.js",
   "types": "lib/index.d.ts",
@@ -16,12 +16,13 @@
     "start": "env-cmd ts-node-dev src/index.ts",
     "build": "tsc",
     "lint": "eslint 'src/**/*.{js,ts}' --quiet --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
     "test": "jest",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
-    "preversion" : "npm run lint",
-    "version" : "npm run format && git add -A src",
-    "postversion" : "git push && git push --tags"
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "author": "Kenneth Raknes",
   "license": "MIT",
