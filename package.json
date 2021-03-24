@@ -3,7 +3,7 @@
   "version": "0.1.2",
   "description": "Simple JSON wrapper for use with vMix HTTP API",
   "main": "dist/index.js",
-  "types": "lib/index.d.ts",
+  "types": "dist/index.d.ts",
   "homepage": "https://github.com/raknes/vmix-json-wrapper#readme",
   "url": "https://github.com/raknes/vmix-json-wrapper/issues",
   "email": "raknes@hotmail.com",
