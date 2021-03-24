@@ -3,7 +3,7 @@ import { parseStringPromise } from 'xml2js';
 
 export class VMix {
   public readonly options: VMixConfig;
-  constructor(public readonly newOptions?: VMixConfig) {
+  constructor(newOptions?: VMixConfig) {
     if (!newOptions) {
       this.options = {
         apiUrl: process.env['VMIX_API_URL'] ?? 'http://localhost:8088/api/',
