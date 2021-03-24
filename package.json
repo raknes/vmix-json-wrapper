@@ -9,7 +9,7 @@
   "email": "raknes@hotmail.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/raknes/vmix-json-wrapper.git"
+    "url": "git+https://github.com/raknes/vmix-json-wrapper.git"
   },
   "scripts": {
     "install": "npm run build",
