@@ -7,5 +7,5 @@ const vmix = new VMix({
   apiUrl: 'http://localhost:8088/api/',
 });
 
-const inputs = vmix.getAllInputs();
+const inputs = await vmix.getAllInputs();
 ```
