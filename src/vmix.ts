@@ -37,10 +37,21 @@ export class VMix {
     }
   }
 
-  public async executeFunction(functionName: string, input?: number, value?: string): Promise<void> {
+  public async executeFunction(
+    functionName: string,
+    input?: number,
+    value?: string,
+    selectedName?: string,
+    selectedIndex?: number,
+    duration?: number,
+  ): Promise<void> {
     const url = `${this.options.apiUrl}?Function=${encodeURIComponent(functionName)}${
       input ? `&Input=${encodeURIComponent(input)}` : ''
-    }${value ? `&Value=${encodeURIComponent(value)}` : ''}`;
+    }${value ? `&Value=${encodeURIComponent(value)}` : ''}${
+      selectedName ? `&SelectedName=${encodeURIComponent(selectedName)}` : ''
+    }${selectedIndex ? `&SelectedIndex=${encodeURIComponent(selectedIndex)}` : ''}${
+      duration ? `&Duration=${encodeURIComponent(duration)}` : ''
+    }`;
 
     await axios.get(url);
   }
