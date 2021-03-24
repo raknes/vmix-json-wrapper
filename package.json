@@ -4,6 +4,13 @@
   "description": "Simple JSON wrapper for use with vMix HTTP API",
   "main": "dist/index.js",
   "types": "lib/index.d.ts",
+  "homepage": "https://github.com/raknes/vmix-json-wrapper#readme",
+  "url": "https://github.com/raknes/vmix-json-wrapper/issues",
+  "email": "raknes@hotmail.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raknes/vmix-json-wrapper.git"
+  },
   "scripts": {
     "install": "npm run build",
     "start": "env-cmd ts-node-dev src/index.ts",
