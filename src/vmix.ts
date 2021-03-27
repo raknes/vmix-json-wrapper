@@ -67,6 +67,22 @@ export interface VMixInput {
   type: string;
 }
 
+export interface VMixStreamingNode {
+  _: string;
+
+  channel1?: string;
+  channel2?: string;
+  channel3?: string;
+}
+
+export function isVMixStreamingNode(obj: unknown): obj is VMixStreamingNode {
+  if (typeof obj !== 'object' || obj === null) {
+    return false;
+  }
+
+  return '_' in obj;
+}
+
 export interface VMixState {
   vmix: {
     version: string;
@@ -85,7 +101,14 @@ export interface VMixState {
     active: string;
     recording: string;
     external: string;
-    streaming: string;
+    streaming:
+      | string
+      | {
+          _: string;
+          channel1?: string;
+          channel2?: string;
+          channel3?: string;
+        };
     playlist: string;
     multiCorder: string;
     fullscreen: string;
