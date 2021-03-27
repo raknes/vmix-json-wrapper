@@ -101,14 +101,7 @@ export interface VMixState {
     active: string;
     recording: string;
     external: string;
-    streaming:
-      | string
-      | {
-          _: string;
-          channel1?: string;
-          channel2?: string;
-          channel3?: string;
-        };
+    streaming: string | VMixStreamingNode;
     playlist: string;
     multiCorder: string;
     fullscreen: string;
