@@ -45,12 +45,10 @@ export class VMix {
     selectedIndex?: number,
     duration?: number,
   ): Promise<void> {
-    const url = `${this.options.apiUrl}?Function=${encodeURIComponent(functionName)}${
-      input ? `&Input=${encodeURIComponent(input)}` : ''
-    }${value ? `&Value=${encodeURIComponent(value)}` : ''}${
-      selectedName ? `&SelectedName=${encodeURIComponent(selectedName)}` : ''
-    }${selectedIndex ? `&SelectedIndex=${encodeURIComponent(selectedIndex)}` : ''}${
-      duration ? `&Duration=${encodeURIComponent(duration)}` : ''
+    const url = `${this.options.apiUrl}?Function=${functionName}${input ? `&Input=${input}` : ''}${
+      value ? `&Value=${value}` : ''
+    }${selectedName ? `&SelectedName=${selectedName}` : ''}${selectedIndex ? `&SelectedIndex=${selectedIndex}` : ''}${
+      duration ? `&Duration=${duration}` : ''
     }`;
 
     await axios.get(url);
