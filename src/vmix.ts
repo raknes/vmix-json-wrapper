@@ -70,6 +70,11 @@ export interface VMixInput {
   key: string;
   number: number;
   type: string;
+  title: string;
+  state: string;
+  position?: number;
+  duration?: number;
+  loop?: boolean;
 }
 
 export interface VMixStreamingNode {
