@@ -109,7 +109,7 @@ export interface VMixState {
     };
     preview: string;
     active: string;
-    recording: string;
+    recording: string | VMixStreamingNode;
     external: string;
     streaming: string | VMixStreamingNode;
     playlist: string;
