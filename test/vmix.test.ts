@@ -22,7 +22,6 @@ describe('', () => {
     }
     expect(state.vmix.version).toBe('24.0.0.51');
     expect(state.vmix.inputs.input[0].type).toBe('Blank');
-    expect(state.vmix.recording).toBe('False');
     expect(state.vmix.active).toBe('1');
     expect(state.vmix.streaming).toBe('False');
   });
@@ -75,7 +74,7 @@ export const vmixDefaultResponse = `<vmix>
   <transition number="3" effect="Wipe" duration="1000" />
   <transition number="4" effect="CubeZoom" duration="1000" />
 </transitions>
-<recording>False</recording>
+<recording duration="12" filename1="C:\Users\my\Videos\vMix-Record\2021.10.05-22.02-MY-PC-20211001_test01\archive_dirty - 15.10.2021-10-07-32.mp4" filename2="C:\Users\my\Videos\vMix-Record\2021.10.05-22.02-MY-PC-20211001_test01\archive_clean - 15.10.2021-10-07-32 - Output 1.mp4">True</recording>
 <external>False</external>
 <streaming>False</streaming>
 <playList>False</playList>
