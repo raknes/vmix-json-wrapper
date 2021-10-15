@@ -26,7 +26,7 @@ export class VMix {
       });
       return state as VMixState;
     }
-    return null;
+    throw new Error();
   }
 
   public async getAllInputs(): Promise<VMixInput[] | null> {
@@ -68,13 +68,18 @@ export interface VMixConfig {
 
 export interface VMixInput {
   key: string;
-  number: number;
+  number: string;
   type: string;
   title: string;
+  shortTitle?: string;
   state: string;
-  position?: number;
-  duration?: number;
-  loop?: boolean;
+  position?: string;
+  duration?: string;
+  markIn?: string;
+  markOut?: string;
+  loop?: string;
+  muted?: string;
+  volume?: string;
 }
 
 export interface VMixStreamingNode {
@@ -85,18 +90,34 @@ export interface VMixStreamingNode {
   channel3?: string;
 }
 
+export interface VMixRecordingNode {
+  _: string;
+
+  duration?: string;
+  filename1?: string;
+  filename2?: string;
+}
+
 export function isVMixStreamingNode(obj: unknown): obj is VMixStreamingNode {
   if (typeof obj !== 'object' || obj === null) {
     return false;
   }
 
-  return '_' in obj;
+  return 'channel1' in obj || 'channel2' in obj || 'channel3' in obj;
+}
+export function isVMixRecordingNode(obj: unknown): obj is VMixRecordingNode {
+  if (typeof obj !== 'object' || obj === null) {
+    return false;
+  }
+
+  return 'filename1' in obj || 'filename2' in obj;
 }
 
 export interface VMixState {
   vmix: {
     version: string;
-    editions: string;
+    edition: string;
+    preset: string;
     inputs: {
       input: VMixInput[];
     };
@@ -109,7 +130,7 @@ export interface VMixState {
     };
     preview: string;
     active: string;
-    recording: string | VMixStreamingNode;
+    recording: string | VMixRecordingNode;
     external: string;
     streaming: string | VMixStreamingNode;
     playlist: string;
@@ -117,8 +138,8 @@ export interface VMixState {
     fullscreen: string;
     audio: {
       master: {
-        volume: number;
-        muted: boolean;
+        volume: string;
+        muted: string;
       };
     };
   };
