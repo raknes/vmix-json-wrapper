@@ -2,7 +2,7 @@ import axios from 'axios';
 import { assert } from 'console';
 import { isVMixRecordingNode, VMix } from '../src/vmix';
 
-import { vmixDefaultResponse } from './vmix.test';
+import { recordingFile1, recordingFile2, vmixDefaultResponse } from './vmix.test';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -26,9 +26,11 @@ describe('', () => {
 
     const recordingNode = state.vmix.recording;
     if (isVMixRecordingNode(recordingNode)) {
-      expect(recordingNode.duration).toEqual('12');
+      expect(recordingNode.duration).toEqual(12);
       expect(recordingNode.filename1).not.toBeNull();
       expect(recordingNode.filename2).not.toBeNull();
+      expect(recordingNode.filename1).toEqual(recordingFile1);
+      expect(recordingNode.filename2).toEqual(recordingFile2);
     }
   });
 });

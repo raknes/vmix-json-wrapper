@@ -1,5 +1,6 @@
-import axios, { AxiosInstance } from 'axios';
-import { parseStringPromise } from 'xml2js';
+import axios from 'axios';
+import parser from 'fast-xml-parser';
+import he from 'he';
 
 export class VMix {
   public readonly options: VMixConfig;
@@ -20,10 +21,36 @@ export class VMix {
       timeout: this.options.timeout,
     });
     if (response && response.status === 200) {
-      const state = await parseStringPromise(response.data, {
-        mergeAttrs: true,
-        explicitArray: false,
+      const state = parser.parse(response.data, {
+        allowBooleanAttributes: true,
+        ignoreAttributes: false,
+        attributeNamePrefix: '',
+        parseTrueNumberOnly: true,
+        parseAttributeValue: true,
+        parseNodeValue: true,
+        tagValueProcessor: (val: string) => {
+          if (val === 'False') {
+            return 'false';
+          }
+          if (val === 'True') {
+            return 'true';
+          }
+          return he.decode(val, { isAttributeValue: true });
+        },
+        attrValueProcessor: (val: string) => {
+          if (val === 'False') {
+            return 'false';
+          }
+          if (val === 'True') {
+            return 'true';
+          }
+          return he.decode(val);
+        },
       });
+      // const state = await parseStringPromise(response.data, {
+      //   mergeAttrs: true,
+      //   explicitArray: false,
+      // });
       return state as VMixState;
     }
     throw new Error();
