@@ -95,18 +95,18 @@ export interface VMixConfig {
 
 export interface VMixInput {
   key: string;
-  number: string;
+  number: number;
   type: string;
   title: string;
   shortTitle?: string;
   state: string;
   position?: string;
   duration?: string;
-  markIn?: string;
-  markOut?: string;
-  loop?: string;
+  markIn?: number;
+  markOut?: number;
+  loop?: boolean;
   muted?: string;
-  volume?: string;
+  volume?: number;
 }
 
 export interface VMixStreamingNode {
@@ -120,7 +120,7 @@ export interface VMixStreamingNode {
 export interface VMixRecordingNode {
   _: string;
 
-  duration?: string;
+  duration?: number;
   filename1?: string;
   filename2?: string;
 }
@@ -155,18 +155,18 @@ export interface VMixState {
         },
       ];
     };
-    preview: string;
-    active: string;
+    preview: number;
+    active: number;
     recording: string | VMixRecordingNode;
     external: string;
     streaming: string | VMixStreamingNode;
     playlist: string;
     multiCorder: string;
-    fullscreen: string;
+    fullscreen: boolean;
     audio: {
       master: {
-        volume: string;
-        muted: string;
+        volume: number;
+        muted: boolean;
       };
     };
   };
