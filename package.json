@@ -1,6 +1,6 @@
 {
   "name": "vmix-json-wrapper",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Simple JSON wrapper for use with vMix HTTP API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
