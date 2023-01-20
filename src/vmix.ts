@@ -1,8 +1,8 @@
 import axios from 'axios';
-import parser from 'fast-xml-parser';
+import { X2jOptionsOptional, XMLParser } from 'fast-xml-parser';
 import he from 'he';
-
 export class VMix {
+  private staticState?: VMixState = undefined;
   public readonly options: VMixConfig;
 
   constructor(newOptions?: VMixConfig) {
@@ -13,44 +13,48 @@ export class VMix {
       };
     } else {
       this.options = newOptions;
+
+      if (this.options.staticState) {
+        this.staticState = this.options.staticState;
+      }
     }
   }
 
   public async getCurrentState(): Promise<VMixState | null> {
+    if (this.staticState) {
+      return this.staticState;
+    }
     const response = await axios.get(this.options.apiUrl, {
       timeout: this.options.timeout,
     });
     if (response && response.status === 200) {
-      const state = parser.parse(response.data, {
+      const options: X2jOptionsOptional = {
         allowBooleanAttributes: true,
         ignoreAttributes: false,
         attributeNamePrefix: '',
-        parseTrueNumberOnly: true,
         parseAttributeValue: true,
-        parseNodeValue: true,
-        tagValueProcessor: (val: string) => {
+        parseTagValue: true,
+        tagValueProcessor: (name: string, val: string) => {
           if (val === 'False') {
-            return 'false';
+            return false;
           }
           if (val === 'True') {
-            return 'true';
-          }
-          return he.decode(val, { isAttributeValue: true });
-        },
-        attrValueProcessor: (val: string) => {
-          if (val === 'False') {
-            return 'false';
-          }
-          if (val === 'True') {
-            return 'true';
+            return true;
           }
           return he.decode(val);
         },
-      });
-      // const state = await parseStringPromise(response.data, {
-      //   mergeAttrs: true,
-      //   explicitArray: false,
-      // });
+        attributeValueProcessor: (name: string, val: string) => {
+          if (val === 'False') {
+            return false;
+          }
+          if (val === 'True') {
+            return true;
+          }
+          return he.decode(val, { isAttributeValue: true });
+        },
+      };
+      const parser = new XMLParser(options);
+      const state = parser.parse(response.data);
       return state as VMixState;
     }
     throw new Error();
@@ -76,6 +80,9 @@ export class VMix {
     selectedIndex?: number,
     duration?: number,
   ): Promise<void> {
+    if (this.staticState) {
+      return;
+    }
     const url = `${this.options.apiUrl}?Function=${functionName}${input ? `&Input=${input}` : ''}${
       value ? `&Value=${value}` : ''
     }${selectedName ? `&SelectedName=${selectedName}` : ''}${selectedIndex ? `&SelectedIndex=${selectedIndex}` : ''}${
@@ -91,6 +98,7 @@ export class VMix {
 export interface VMixConfig {
   apiUrl: string;
   timeout?: number;
+  staticState?: VMixState;
 }
 
 export interface VMixInput {
