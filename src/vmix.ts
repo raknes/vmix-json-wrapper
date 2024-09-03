@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { X2jOptionsOptional, XMLParser } from 'fast-xml-parser';
+import { X2jOptions, XMLParser } from 'fast-xml-parser';
 import he from 'he';
 export class VMix {
   private staticState?: VMixState = undefined;
@@ -28,7 +28,7 @@ export class VMix {
       timeout: this.options.timeout,
     });
     if (response && response.status === 200) {
-      const options: X2jOptionsOptional = {
+      const options: X2jOptions = {
         allowBooleanAttributes: true,
         ignoreAttributes: false,
         attributeNamePrefix: '',
