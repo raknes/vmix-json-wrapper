@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { assert } from 'console';
+import { vi, type Mocked } from 'vitest';
 import { isVMixRecordingNode, VMix } from '../src/vmix';
 
-import { recordingFile1, recordingFile2, vmixDefaultResponse } from './vmix.test';
+import { recordingFile1, recordingFile2, vmixDefaultResponse } from './fixtures';
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+vi.mock('axios');
+const mockedAxios = axios as Mocked<typeof axios>;
 
 describe('', () => {
   it('should find 2 recordings', async () => {
