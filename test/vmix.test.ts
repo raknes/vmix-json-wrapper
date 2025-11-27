@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect } from 'vitest';
 import { VMix, isVMixStreamingNode } from '../src/vmix';
 import { vmixDefaultResponse, vmixResponse1OutputStream } from './fixtures';
 

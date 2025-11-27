@@ -1,4 +1,5 @@
 import { VMix } from '../src/vmix';
+import { describe, it, expect } from 'vitest';
 
 describe('', () => {
   it('should use default config', () => {
