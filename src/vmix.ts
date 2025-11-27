@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { X2jOptions, XMLParser } from 'fast-xml-parser';
 import he from 'he';
 export class VMix {
@@ -24,40 +23,51 @@ export class VMix {
     if (this.staticState) {
       return this.staticState;
     }
-    const response = await axios.get(this.options.apiUrl, {
-      timeout: this.options.timeout,
-    });
-    if (response && response.status === 200) {
-      const options: X2jOptions = {
-        allowBooleanAttributes: true,
-        ignoreAttributes: false,
-        attributeNamePrefix: '',
-        parseAttributeValue: true,
-        parseTagValue: true,
-        tagValueProcessor: (name: string, val: string) => {
-          if (val === 'False') {
-            return false;
-          }
-          if (val === 'True') {
-            return true;
-          }
-          return he.decode(val);
-        },
-        attributeValueProcessor: (name: string, val: string) => {
-          if (val === 'False') {
-            return false;
-          }
-          if (val === 'True') {
-            return true;
-          }
-          return he.decode(val, { isAttributeValue: true });
-        },
-      };
-      const parser = new XMLParser(options);
-      const state = parser.parse(response.data);
-      return state as VMixState;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.options.timeout);
+
+    try {
+      const response = await fetch(this.options.apiUrl, {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const data = await response.text();
+        const options: X2jOptions = {
+          allowBooleanAttributes: true,
+          ignoreAttributes: false,
+          attributeNamePrefix: '',
+          parseAttributeValue: true,
+          parseTagValue: true,
+          tagValueProcessor: (name: string, val: string) => {
+            if (val === 'False') {
+              return false;
+            }
+            if (val === 'True') {
+              return true;
+            }
+            return he.decode(val);
+          },
+          attributeValueProcessor: (name: string, val: string) => {
+            if (val === 'False') {
+              return false;
+            }
+            if (val === 'True') {
+              return true;
+            }
+            return he.decode(val, { isAttributeValue: true });
+          },
+        };
+        const parser = new XMLParser(options);
+        const state = parser.parse(data);
+        return state as VMixState;
+      }
+      throw new Error();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
     }
-    throw new Error();
   }
 
   public async getAllInputs(): Promise<VMixInput[] | null> {
@@ -89,9 +99,16 @@ export class VMix {
       duration ? `&Duration=${duration}` : ''
     }`;
 
-    await axios.get(url, {
-      timeout: this.options.timeout,
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.options.timeout);
+
+    try {
+      await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
   }
 }
 

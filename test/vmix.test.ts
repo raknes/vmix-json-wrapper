@@ -1,16 +1,15 @@
-import axios from 'axios';
-import { vi, type Mocked } from 'vitest';
+import { vi } from 'vitest';
 import { VMix, isVMixStreamingNode } from '../src/vmix';
 import { vmixDefaultResponse, vmixResponse1OutputStream } from './fixtures';
 
-vi.mock('axios');
-const mockedAxios = axios as Mocked<typeof axios>;
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
 describe('VMix API', () => {
   it('should get default vmix state', async () => {
-    mockedAxios.get.mockResolvedValue({
-      status: 200,
-      data: vmixDefaultResponse,
+    mockFetch.mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve(vmixDefaultResponse),
     });
     const vmix = new VMix({
       apiUrl: 'http://my.host1:8088',
@@ -28,9 +27,9 @@ describe('VMix API', () => {
     expect(state.vmix.streaming).toBe(false);
   });
   it('should get 1 stream channel', async () => {
-    mockedAxios.get.mockResolvedValue({
-      status: 200,
-      data: vmixResponse1OutputStream,
+    mockFetch.mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve(vmixResponse1OutputStream),
     });
     const vmix = new VMix({
       apiUrl: 'http://my.host1:8088',

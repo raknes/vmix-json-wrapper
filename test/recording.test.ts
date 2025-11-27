@@ -1,18 +1,17 @@
-import axios from 'axios';
 import { assert } from 'console';
-import { vi, type Mocked } from 'vitest';
+import { vi } from 'vitest';
 import { isVMixRecordingNode, VMix } from '../src/vmix';
 
 import { recordingFile1, recordingFile2, vmixDefaultResponse } from './fixtures';
 
-vi.mock('axios');
-const mockedAxios = axios as Mocked<typeof axios>;
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
-describe('', () => {
+describe('Recording', () => {
   it('should find 2 recordings', async () => {
-    mockedAxios.get.mockResolvedValue({
-      status: 200,
-      data: vmixDefaultResponse,
+    mockFetch.mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve(vmixDefaultResponse),
     });
 
     const vmix = new VMix();
