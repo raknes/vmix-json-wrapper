@@ -1,5 +1,4 @@
-import { assert } from 'console';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, assert } from 'vitest';
 import { isVMixRecordingNode, VMix } from '../src/vmix';
 
 import { recordingFile1, recordingFile2, vmixDefaultResponse } from './fixtures';

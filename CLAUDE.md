@@ -13,11 +13,13 @@ pnpm run format     # Prettier formatting
 ```
 
 Run a single test file:
+
 ```bash
 pnpm run test -- test/vmix.test.ts
 ```
 
 Run tests matching a pattern:
+
 ```bash
 pnpm run test -- -t "should get default vmix state"
 ```
@@ -28,13 +30,13 @@ This is an npm package that wraps the vMix HTTP API, converting XML responses to
 
 ### Module Structure
 
-| File | Purpose |
-|------|---------|
-| `src/vmix.ts` | `VMix` class - API client for connecting to vMix |
-| `src/types.ts` | TypeScript interfaces (`VMixConfig`, `VMixState`, `VMixInput`, `FunctionOptions`, etc.) |
-| `src/errors.ts` | Custom error classes (`VMixError`, `VMixConnectionError`, `VMixTimeoutError`, `VMixApiError`) |
-| `src/project.ts` | `VMixProject` class - mutable state wrapper for dynamic manipulation |
-| `src/index.ts` | Public exports |
+| File             | Purpose                                                                                       |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| `src/vmix.ts`    | `VMix` class - API client for connecting to vMix                                              |
+| `src/types.ts`   | TypeScript interfaces (`VMixConfig`, `VMixState`, `VMixInput`, `FunctionOptions`, etc.)       |
+| `src/errors.ts`  | Custom error classes (`VMixError`, `VMixConnectionError`, `VMixTimeoutError`, `VMixApiError`) |
+| `src/project.ts` | `VMixProject` class - mutable state wrapper for dynamic manipulation                          |
+| `src/index.ts`   | Public exports                                                                                |
 
 ### How it works
 
@@ -49,12 +51,13 @@ This is an npm package that wraps the vMix HTTP API, converting XML responses to
 ### Key Classes
 
 **VMix** - API client
+
 - `getCurrentState()` - Fetch and parse vMix state
 - `getAllInputs()` - Get all inputs from current state
 - `executeFunction(name, options?)` - Execute a vMix function
 
 **VMixProject** - State manipulation (mutable wrapper around `VMixState`)
-- `fromState(state)` - Create project from state snapshot
+
 - `getInputs()`, `getInputByNumber()`, `getInputByKey()` - Query inputs
 - `addInput()`, `removeInputByNumber()`, `updateInput()` - Modify inputs
 - `isRecording()`, `isStreaming()`, `getMasterVolume()` - Status helpers
@@ -70,6 +73,7 @@ This is an npm package that wraps the vMix HTTP API, converting XML responses to
 ### Error Handling
 
 Custom errors provide context for debugging:
+
 - `VMixConnectionError` - Failed to connect (includes URL and cause)
 - `VMixTimeoutError` - Request timed out (includes URL and timeout duration)
 - `VMixApiError` - Non-OK HTTP response (includes URL, status, statusText)

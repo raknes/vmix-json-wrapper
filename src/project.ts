@@ -12,13 +12,6 @@ export class VMixProject {
   }
 
   /**
-   * Creates a VMixProject from an existing state snapshot
-   */
-  static fromState(state: VMixState): VMixProject {
-    return new VMixProject(state);
-  }
-
-  /**
    * Returns the current state (immutable copy)
    */
   getState(): VMixState {
@@ -93,7 +86,7 @@ export class VMixProject {
     const index = inputs.findIndex((input) => input.number === number);
     if (index === -1) return false;
 
-    inputs[index] = { ...inputs[index], ...updates };
+    inputs[index] = { ...inputs[index], ...updates, number: inputs[index].number };
     this.state.vmix.inputs.input = inputs;
     return true;
   }

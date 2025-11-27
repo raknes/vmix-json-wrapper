@@ -1,7 +1,7 @@
 import { VMix } from '../src/vmix';
 import { describe, it, expect } from 'vitest';
 
-describe('', () => {
+describe('VMix Configuration', () => {
   it('should use default config', () => {
     const vmix = new VMix();
     expect(vmix.options.apiUrl).toBe('http://localhost:8088/api/');

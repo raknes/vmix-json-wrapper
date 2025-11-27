@@ -4,6 +4,8 @@ import { VMixApiError, VMixConnectionError, VMixTimeoutError } from './errors';
 import { FunctionOptions, VMixConfig, VMixInput, VMixState } from './types';
 
 export class VMix {
+  private static readonly DEFAULT_TIMEOUT = 60000;
+
   private staticState?: VMixState = undefined;
   public readonly options: VMixConfig;
 
@@ -27,7 +29,7 @@ export class VMix {
       return this.staticState;
     }
 
-    const timeout = this.options.timeout ?? 60000;
+    const timeout = this.options.timeout ?? VMix.DEFAULT_TIMEOUT;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -39,31 +41,7 @@ export class VMix {
 
       if (response.ok) {
         const data = await response.text();
-        const options: X2jOptions = {
-          allowBooleanAttributes: true,
-          ignoreAttributes: false,
-          attributeNamePrefix: '',
-          parseAttributeValue: true,
-          parseTagValue: true,
-          tagValueProcessor: (name: string, val: string) => {
-            if (val === 'False') {
-              return false;
-            }
-            if (val === 'True') {
-              return true;
-            }
-            return he.decode(val);
-          },
-          attributeValueProcessor: (name: string, val: string) => {
-            if (val === 'False') {
-              return false;
-            }
-            if (val === 'True') {
-              return true;
-            }
-            return he.decode(val, { isAttributeValue: true });
-          },
-        };
+        const options: X2jOptions = this.getParserOptions();
         const parser = new XMLParser(options);
         const state = parser.parse(data);
         return state as VMixState;
@@ -127,7 +105,7 @@ export class VMix {
     }
 
     const url = `${this.options.apiUrl}?${params.toString()}`;
-    const timeout = this.options.timeout ?? 60000;
+    const timeout = this.options.timeout ?? VMix.DEFAULT_TIMEOUT;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -151,6 +129,33 @@ export class VMix {
 
       throw new VMixConnectionError(url, error instanceof Error ? error : undefined);
     }
+  }
+  private getParserOptions(): X2jOptions {
+    return {
+      allowBooleanAttributes: true,
+      ignoreAttributes: false,
+      attributeNamePrefix: '',
+      parseAttributeValue: true,
+      parseTagValue: true,
+      tagValueProcessor: (name: string, val: string) => {
+        if (val === 'False') {
+          return false;
+        }
+        if (val === 'True') {
+          return true;
+        }
+        return he.decode(val);
+      },
+      attributeValueProcessor: (name: string, val: string) => {
+        if (val === 'False') {
+          return false;
+        }
+        if (val === 'True') {
+          return true;
+        }
+        return he.decode(val, { isAttributeValue: true });
+      },
+    };
   }
 }
 
