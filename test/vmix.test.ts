@@ -196,7 +196,7 @@ describe('VMix API', () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         'http://my.host1:8088/api/?Function=Cut',
-        expect.objectContaining({ signal: expect.any(AbortSignal) })
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
       );
     });
 
@@ -208,10 +208,7 @@ describe('VMix API', () => {
 
       await vmix.executeFunction('Cut', { input: 1 });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://my.host1:8088/api/?Function=Cut&Input=1',
-        expect.any(Object)
-      );
+      expect(mockFetch).toHaveBeenCalledWith('http://my.host1:8088/api/?Function=Cut&Input=1', expect.any(Object));
     });
 
     it('should include all FunctionOptions parameters', async () => {
