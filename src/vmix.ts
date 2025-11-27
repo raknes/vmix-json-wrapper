@@ -1,7 +1,11 @@
-import axios from 'axios';
 import { X2jOptions, XMLParser } from 'fast-xml-parser';
 import he from 'he';
+import { VMixApiError, VMixConnectionError, VMixTimeoutError } from './errors';
+import { FunctionOptions, VMixConfig, VMixInput, VMixState } from './types';
+
 export class VMix {
+  private static readonly DEFAULT_TIMEOUT = 60000;
+
   private staticState?: VMixState = undefined;
   public readonly options: VMixConfig;
 
@@ -24,40 +28,39 @@ export class VMix {
     if (this.staticState) {
       return this.staticState;
     }
-    const response = await axios.get(this.options.apiUrl, {
-      timeout: this.options.timeout,
-    });
-    if (response && response.status === 200) {
-      const options: X2jOptions = {
-        allowBooleanAttributes: true,
-        ignoreAttributes: false,
-        attributeNamePrefix: '',
-        parseAttributeValue: true,
-        parseTagValue: true,
-        tagValueProcessor: (name: string, val: string) => {
-          if (val === 'False') {
-            return false;
-          }
-          if (val === 'True') {
-            return true;
-          }
-          return he.decode(val);
-        },
-        attributeValueProcessor: (name: string, val: string) => {
-          if (val === 'False') {
-            return false;
-          }
-          if (val === 'True') {
-            return true;
-          }
-          return he.decode(val, { isAttributeValue: true });
-        },
-      };
-      const parser = new XMLParser(options);
-      const state = parser.parse(response.data);
-      return state as VMixState;
+
+    const timeout = this.options.timeout ?? VMix.DEFAULT_TIMEOUT;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(this.options.apiUrl, {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const data = await response.text();
+        const options: X2jOptions = this.getParserOptions();
+        const parser = new XMLParser(options);
+        const state = parser.parse(data);
+        return state as VMixState;
+      }
+
+      throw new VMixApiError(this.options.apiUrl, response.status, response.statusText);
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error instanceof VMixApiError) {
+        throw error;
+      }
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new VMixTimeoutError(this.options.apiUrl, timeout);
+      }
+
+      throw new VMixConnectionError(this.options.apiUrl, error instanceof Error ? error : undefined);
     }
-    throw new Error();
   }
 
   public async getAllInputs(): Promise<VMixInput[] | null> {
@@ -72,110 +75,90 @@ export class VMix {
     }
   }
 
-  public async executeFunction(
-    functionName: string,
-    input?: number,
-    value?: string,
-    selectedName?: string,
-    selectedIndex?: number,
-    duration?: number,
-  ): Promise<void> {
+  /**
+   * Execute a vMix function
+   * @param functionName - The vMix function to execute
+   * @param options - Optional parameters for the function
+   */
+  public async executeFunction(functionName: string, options?: FunctionOptions): Promise<void> {
     if (this.staticState) {
       return;
     }
-    const url = `${this.options.apiUrl}?Function=${functionName}${input ? `&Input=${input}` : ''}${
-      value ? `&Value=${value}` : ''
-    }${selectedName ? `&SelectedName=${selectedName}` : ''}${selectedIndex ? `&SelectedIndex=${selectedIndex}` : ''}${
-      duration ? `&Duration=${duration}` : ''
-    }`;
 
-    await axios.get(url, {
-      timeout: this.options.timeout,
-    });
+    const params = new URLSearchParams();
+    params.set('Function', functionName);
+
+    if (options?.input !== undefined) {
+      params.set('Input', String(options.input));
+    }
+    if (options?.value !== undefined) {
+      params.set('Value', options.value);
+    }
+    if (options?.selectedName !== undefined) {
+      params.set('SelectedName', options.selectedName);
+    }
+    if (options?.selectedIndex !== undefined) {
+      params.set('SelectedIndex', String(options.selectedIndex));
+    }
+    if (options?.duration !== undefined) {
+      params.set('Duration', String(options.duration));
+    }
+
+    const url = `${this.options.apiUrl}?${params.toString()}`;
+    const timeout = this.options.timeout ?? VMix.DEFAULT_TIMEOUT;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new VMixApiError(url, response.status, response.statusText);
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error instanceof VMixApiError) {
+        throw error;
+      }
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new VMixTimeoutError(url, timeout);
+      }
+
+      throw new VMixConnectionError(url, error instanceof Error ? error : undefined);
+    }
+  }
+  private getParserOptions(): X2jOptions {
+    return {
+      allowBooleanAttributes: true,
+      ignoreAttributes: false,
+      attributeNamePrefix: '',
+      parseAttributeValue: true,
+      parseTagValue: true,
+      tagValueProcessor: (name: string, val: string) => {
+        if (val === 'False') {
+          return false;
+        }
+        if (val === 'True') {
+          return true;
+        }
+        return he.decode(val);
+      },
+      attributeValueProcessor: (name: string, val: string) => {
+        if (val === 'False') {
+          return false;
+        }
+        if (val === 'True') {
+          return true;
+        }
+        return he.decode(val, { isAttributeValue: true });
+      },
+    };
   }
 }
 
-export interface VMixConfig {
-  apiUrl: string;
-  timeout?: number;
-  staticState?: VMixState;
-}
-
-export interface VMixInput {
-  key: string;
-  number: number;
-  type: string;
-  title: string;
-  shortTitle?: string;
-  state: string;
-  position?: string;
-  duration?: string;
-  markIn?: number;
-  markOut?: number;
-  loop?: boolean;
-  muted?: string;
-  volume?: number;
-}
-
-export interface VMixStreamingNode {
-  _: string;
-
-  channel1?: string;
-  channel2?: string;
-  channel3?: string;
-}
-
-export interface VMixRecordingNode {
-  _: string;
-
-  duration?: number;
-  filename1?: string;
-  filename2?: string;
-}
-
-export function isVMixStreamingNode(obj: unknown): obj is VMixStreamingNode {
-  if (typeof obj !== 'object' || obj === null) {
-    return false;
-  }
-
-  return 'channel1' in obj || 'channel2' in obj || 'channel3' in obj;
-}
-export function isVMixRecordingNode(obj: unknown): obj is VMixRecordingNode {
-  if (typeof obj !== 'object' || obj === null) {
-    return false;
-  }
-
-  return 'filename1' in obj || 'filename2' in obj;
-}
-
-export interface VMixState {
-  vmix: {
-    version: string;
-    edition: string;
-    preset: string;
-    inputs: {
-      input: VMixInput[];
-    };
-    overlays: {
-      overlay: [
-        {
-          number: number;
-        },
-      ];
-    };
-    preview: number;
-    active: number;
-    recording: string | VMixRecordingNode;
-    external: string;
-    streaming: string | VMixStreamingNode;
-    playlist: string;
-    multiCorder: string;
-    fullscreen: boolean;
-    audio: {
-      master: {
-        volume: number;
-        muted: boolean;
-      };
-    };
-  };
-}
+// Re-export types for convenience
+export type { FunctionOptions, VMixConfig, VMixInput, VMixState } from './types';
+export { isVMixRecordingNode, isVMixStreamingNode, type VMixRecordingNode, type VMixStreamingNode } from './types';

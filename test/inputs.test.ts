@@ -1,16 +1,16 @@
-import axios from 'axios';
+import { vi, describe, it, expect } from 'vitest';
 import { VMix } from '../src/vmix';
 
-import { vmixDefaultResponse } from './vmix.test';
+import { vmixDefaultResponse } from './fixtures';
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
-describe('', () => {
+describe('Inputs', () => {
   it('should find 2 inputs', async () => {
-    mockedAxios.get.mockResolvedValue({
-      status: 200,
-      data: vmixDefaultResponse,
+    mockFetch.mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve(vmixDefaultResponse),
     });
 
     const vmix = new VMix();
